@@ -1,0 +1,454 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>汽车仪表盘绘制 | Sakura的博客</title><meta name="author" content="Sakura"><meta name="copyright" content="Sakura"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1、汽车仪表盘效果图 上面是通过QPainter绘制出来的汽车仪表盘，可能与真实的汽车仪表盘有些差距，但总体来说还可以吧，下面将会详细讲解如何绘制汽车仪表盘。 2、绘制前的准备首先我们将窗体背景设置为偏黑色，这样方便我们后续观察效果，以及将窗口固定位1280*800，代码如下： 1234this-&gt;setFixedSize(1280,800);QPalette pale&#x3D;this-&gt;p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="汽车仪表盘绘制">
+<meta property="og:url" content="https://jjking20010901.github.io/posts/cb2eafdb.html">
+<meta property="og:site_name" content="Sakura的博客">
+<meta property="og:description" content="1、汽车仪表盘效果图 上面是通过QPainter绘制出来的汽车仪表盘，可能与真实的汽车仪表盘有些差距，但总体来说还可以吧，下面将会详细讲解如何绘制汽车仪表盘。 2、绘制前的准备首先我们将窗体背景设置为偏黑色，这样方便我们后续观察效果，以及将窗口固定位1280*800，代码如下： 1234this-&gt;setFixedSize(1280,800);QPalette pale&#x3D;this-&gt;p">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://source.fomal.cc/img/default_cover_11.webp">
+<meta property="article:published_time" content="2022-11-05T04:53:44.000Z">
+<meta property="article:modified_time" content="2022-11-05T04:56:02.973Z">
+<meta property="article:author" content="Sakura">
+<meta property="article:tag" content="QtWidget自绘">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://source.fomal.cc/img/default_cover_11.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://jjking20010901.github.io/posts/cb2eafdb"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="#3b70fc"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/128.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="mask-icon" href="/img/siteicon/128.png" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Sakura","link":"链接: ","source":"来源: Sakura的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '汽车仪表盘绘制',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-11-05 12:56:02'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.css" /><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Sakura的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img2.woyaogexing.com/2019/04/27/a8322a40f63b40f79f5300d7fd75bf18!400x400.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/bangumis/index.html"><i class="fa-fw fas fa-home"></i><span> 追番</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://source.fomal.cc/img/default_cover_11.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Sakura的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/bangumis/index.html"><i class="fa-fw fas fa-home"></i><span> 追番</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">汽车仪表盘绘制</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-05T04:53:44.000Z" title="发表于 2022-11-05 12:53:44">2022-11-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-05T04:56:02.973Z" title="更新于 2022-11-05 12:56:02">2022-11-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/QtWidget/">QtWidget</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="汽车仪表盘绘制"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1、汽车仪表盘效果图"><a href="#1、汽车仪表盘效果图" class="headerlink" title="1、汽车仪表盘效果图"></a>1、汽车仪表盘效果图</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301516841.png" alt="image-20220830151624760"></p>
+<p>上面是通过QPainter绘制出来的汽车仪表盘，可能与真实的汽车仪表盘有些差距，但总体来说还可以吧，下面将会详细讲解如何绘制汽车仪表盘。</p>
+<h2 id="2、绘制前的准备"><a href="#2、绘制前的准备" class="headerlink" title="2、绘制前的准备"></a>2、绘制前的准备</h2><p>首先我们将窗体背景设置为偏黑色，这样方便我们后续观察效果，以及将窗口固定位1280*800，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>-&gt;<span class="built_in">setFixedSize</span>(<span class="number">1280</span>,<span class="number">800</span>);</span><br><span class="line">QPalette pale=<span class="keyword">this</span>-&gt;<span class="built_in">palette</span>();</span><br><span class="line">pale.<span class="built_in">setBrush</span>(QPalette::Window,<span class="built_in">QBrush</span>(<span class="built_in">QColor</span>(<span class="number">40</span>,<span class="number">40</span>,<span class="number">40</span>)));</span><br><span class="line"><span class="keyword">this</span>-&gt;<span class="built_in">setPalette</span>(pale);</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301439671.png" alt="image-20220830143915607"></p>
+<h2 id="3、绘制刻度线"><a href="#3、绘制刻度线" class="headerlink" title="3、绘制刻度线"></a>3、绘制刻度线</h2><p>首先我们要获取仪表盘的中心点radius以及仪表盘的宽高，然后将画笔移动到窗口的中下方，移动画笔也就是移动坐标系。</p>
+<p>然后使用QPainter中的抗锯齿的方法，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPainter <span class="title">painter</span><span class="params">(<span class="keyword">this</span>)</span></span>;</span><br><span class="line">   <span class="type">int</span> width=<span class="keyword">this</span>-&gt;<span class="built_in">width</span>();</span><br><span class="line">   <span class="comment">//仪表盘高度</span></span><br><span class="line">   <span class="type">int</span> height=<span class="keyword">this</span>-&gt;<span class="built_in">height</span>()<span class="number">-100</span>;</span><br><span class="line">   <span class="comment">//仪表盘中心位置</span></span><br><span class="line">   <span class="type">int</span> radius=((width&gt;height)? height:width)/<span class="number">2</span>;</span><br><span class="line">   <span class="comment">//移动画笔到中下方</span></span><br><span class="line">   painter.<span class="built_in">translate</span>(width/<span class="number">2</span>,height*<span class="number">0.6</span>);</span><br><span class="line">   <span class="comment">//启用反锯齿</span></span><br><span class="line">   painter.<span class="built_in">setRenderHint</span>(QPainter::Antialiasing,<span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+<p>接下来就是画刻度线，首先我们要组装刻度点的路径，使用QPainterPath。然后是绘制长的刻度线，大于或者等于160的刻度值为红色，其他的刻度线为白色，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//画刻度线</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawSmallScale</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//组装点的路径图</span></span><br><span class="line">    QPainterPath pointPath_small;</span><br><span class="line">    pointPath_small.<span class="built_in">moveTo</span>(<span class="number">-2</span>,<span class="number">-2</span>);</span><br><span class="line">    pointPath_small.<span class="built_in">lineTo</span>(<span class="number">2</span>,<span class="number">-2</span>);</span><br><span class="line">    pointPath_small.<span class="built_in">lineTo</span>(<span class="number">2</span>,<span class="number">8</span>);</span><br><span class="line">    pointPath_small.<span class="built_in">lineTo</span>(<span class="number">-2</span>,<span class="number">8</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    QPainterPath pointPath_big;</span><br><span class="line">    pointPath_big.<span class="built_in">moveTo</span>(<span class="number">-2</span>,<span class="number">-2</span>);</span><br><span class="line">    pointPath_big.<span class="built_in">lineTo</span>(<span class="number">2</span>,<span class="number">-2</span>);</span><br><span class="line">    pointPath_big.<span class="built_in">lineTo</span>(<span class="number">2</span>,<span class="number">20</span>);</span><br><span class="line">    pointPath_big.<span class="built_in">lineTo</span>(<span class="number">-2</span>,<span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//绘制121个小点</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">121</span>;i+=<span class="number">2</span>)&#123;</span><br><span class="line">        <span class="function">QPointF <span class="title">point</span><span class="params">(<span class="number">0</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">        painter.<span class="built_in">save</span>();</span><br><span class="line">        point.<span class="built_in">setX</span>(radius*<span class="built_in">qCos</span>(((<span class="number">210</span>-i*<span class="number">2</span>)*M_PI)/<span class="number">180</span>));</span><br><span class="line">        point.<span class="built_in">setY</span>(radius*<span class="built_in">qSin</span>(((<span class="number">210</span>-i*<span class="number">2</span>)*M_PI)/<span class="number">180</span>));</span><br><span class="line">        painter.<span class="built_in">translate</span>(point.<span class="built_in">x</span>(),-point.<span class="built_in">y</span>());</span><br><span class="line">        painter.<span class="built_in">rotate</span>(<span class="number">-120</span>+i*<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(i&lt;<span class="number">80</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            painter.<span class="built_in">setBrush</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(i&gt;=<span class="number">80</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            painter.<span class="built_in">setBrush</span>(<span class="built_in">QColor</span>(<span class="number">235</span>,<span class="number">70</span>,<span class="number">70</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(i%<span class="number">5</span> == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            painter.<span class="built_in">drawPath</span>(pointPath_big);<span class="comment">//绘画大刻度</span></span><br><span class="line">        &#125;<span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            painter.<span class="built_in">drawPath</span>(pointPath_small);<span class="comment">//绘画小刻度</span></span><br><span class="line">        &#125;</span><br><span class="line">        painter.<span class="built_in">restore</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301452519.png" alt="image-20220830145212461"></p>
+<h2 id="4、刻度数字"><a href="#4、刻度数字" class="headerlink" title="4、刻度数字"></a>4、刻度数字</h2><p>在每一个更长的刻度线上绘制对应的数字，我们要找到对应的坐标，还要设置数字的字体以及大小，而且我们还要旋转画笔，让每个对应的数字都是在正确的位置，通过角度旋转的角度来计算弧度，然后通过弧度来获取对应的坐标，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//刻度数字</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawDigital</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//设置画笔，画笔默认NOPEN</span></span><br><span class="line">    painter.<span class="built_in">setPen</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>));</span><br><span class="line">    QFont font;</span><br><span class="line">    font.<span class="built_in">setFamily</span>(<span class="string">&quot;Arial&quot;</span>);</span><br><span class="line">    font.<span class="built_in">setPointSize</span>(<span class="number">15</span>);</span><br><span class="line">    font.<span class="built_in">setBold</span>(<span class="literal">true</span>);</span><br><span class="line">    painter.<span class="built_in">setFont</span>(font);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">13</span>;++i)&#123;</span><br><span class="line">        <span class="function">QPointF <span class="title">point</span><span class="params">(<span class="number">0</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">        painter.<span class="built_in">save</span>();</span><br><span class="line">        point.<span class="built_in">setX</span>(radius*<span class="built_in">qCos</span>(((<span class="number">210</span>-i*<span class="number">20</span>)*M_PI)/<span class="number">180</span>));</span><br><span class="line">        point.<span class="built_in">setY</span>(radius*<span class="built_in">qSin</span>(((<span class="number">210</span>-i*<span class="number">20</span>)*M_PI)/<span class="number">180</span>));</span><br><span class="line">        painter.<span class="built_in">translate</span>(point.<span class="built_in">x</span>(),-point.<span class="built_in">y</span>());</span><br><span class="line">        painter.<span class="built_in">rotate</span>(<span class="number">-120</span>+i*<span class="number">20</span>);</span><br><span class="line">        painter.<span class="built_in">drawText</span>(<span class="number">-25</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">20</span>,Qt::AlignCenter,QString::<span class="built_in">number</span>(i*<span class="number">20</span>));</span><br><span class="line">        painter.<span class="built_in">restore</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//还原画笔</span></span><br><span class="line">    painter.<span class="built_in">setPen</span>(Qt::NoPen);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301459646.png" alt="image-20220830145901581"></p>
+<h2 id="5、绘制发光的圆圈"><a href="#5、绘制发光的圆圈" class="headerlink" title="5、绘制发光的圆圈"></a>5、绘制发光的圆圈</h2><p>在刻度线的四周绘制一种渐变色的发光圆圈，首先我们要创建大小圆的弧圈，通过arcTo方法，然后在小圆中绘制椭圆，通过addEllipse，然后通过QRadialGradient设置渐变色，最后通过drawPath方法获取大圆减小圆之后的路径，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawCircle</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//保存绘图对象</span></span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    <span class="comment">//计算大小圆路径</span></span><br><span class="line">    QPainterPath outRing;</span><br><span class="line">    QPainterPath inRing;</span><br><span class="line">    outRing.<span class="built_in">moveTo</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    inRing.<span class="built_in">moveTo</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    outRing.<span class="built_in">arcTo</span>(-radius,-radius, <span class="number">2</span>*radius,<span class="number">2</span>*radius,<span class="number">-30</span>,<span class="number">240</span>);</span><br><span class="line">    inRing.<span class="built_in">addEllipse</span>(-radius+<span class="number">50</span>,-radius + <span class="number">50</span>,<span class="number">2</span>*(radius<span class="number">-50</span>),<span class="number">2</span>*(radius<span class="number">-50</span>));</span><br><span class="line">    outRing.<span class="built_in">closeSubpath</span>();</span><br><span class="line">    <span class="comment">//设置渐变色k</span></span><br><span class="line">    <span class="function">QRadialGradient <span class="title">radialGradient</span><span class="params">(<span class="number">0</span>,<span class="number">0</span>,radius,<span class="number">0</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">    radialGradient.<span class="built_in">setColorAt</span>(<span class="number">1</span>,<span class="built_in">QColor</span>(<span class="number">0</span>,<span class="number">82</span>,<span class="number">230</span>));</span><br><span class="line">    radialGradient.<span class="built_in">setColorAt</span>(<span class="number">0.9</span>,Qt::transparent);</span><br><span class="line">    <span class="comment">//设置画刷</span></span><br><span class="line">    painter.<span class="built_in">setBrush</span>(radialGradient);</span><br><span class="line">    <span class="comment">//大圆减小圆</span></span><br><span class="line">    painter.<span class="built_in">drawPath</span>(outRing.<span class="built_in">subtracted</span>(inRing));</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果图如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301504164.png" alt="image-20220830150437094"></p>
+<h2 id="6、绘制指针"><a href="#6、绘制指针" class="headerlink" title="6、绘制指针"></a>6、绘制指针</h2><p>和之前一样我们要组装点的路径，然后是计算点的坐标，这些都可以自己慢慢的试试，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawPointer</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//组装点的路径图</span></span><br><span class="line">    QPainterPath pointPath;</span><br><span class="line">    pointPath.<span class="built_in">moveTo</span>(<span class="number">10</span>,<span class="number">0</span>);</span><br><span class="line">    pointPath.<span class="built_in">lineTo</span>(<span class="number">1</span>,-radius);</span><br><span class="line">    pointPath.<span class="built_in">lineTo</span>(<span class="number">-1</span>,-radius);</span><br><span class="line">    pointPath.<span class="built_in">lineTo</span>(<span class="number">-10</span>,<span class="number">0</span>);</span><br><span class="line">    pointPath.<span class="built_in">arcTo</span>(<span class="number">-10</span>,<span class="number">0</span>,<span class="number">20</span>,<span class="number">20</span>,<span class="number">180</span>,<span class="number">180</span>);</span><br><span class="line">    QPainterPath inRing;</span><br><span class="line">    inRing.<span class="built_in">addEllipse</span>(<span class="number">-5</span>,<span class="number">-5</span>,<span class="number">10</span>,<span class="number">10</span>);</span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//计算并选择绘图对象坐标</span></span><br><span class="line">    painter.<span class="built_in">rotate</span>(degRotate - <span class="number">120</span>);</span><br><span class="line">    painter.<span class="built_in">setBrush</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>));</span><br><span class="line">    painter.<span class="built_in">drawPath</span>(pointPath.<span class="built_in">subtracted</span>(inRing));</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果图：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301508886.png" alt="image-20220830150828813"></p>
+<h2 id="7、绘制中间大圆、小圆以及发光内圈"><a href="#7、绘制中间大圆、小圆以及发光内圈" class="headerlink" title="7、绘制中间大圆、小圆以及发光内圈"></a>7、绘制中间大圆、小圆以及发光内圈</h2><p>绘制大圆的代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawCircle_bom_big</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//保存绘图对象</span></span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    <span class="comment">//计算大小圆路径</span></span><br><span class="line">    QPainterPath inRing;</span><br><span class="line">    inRing.<span class="built_in">moveTo</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    inRing.<span class="built_in">addEllipse</span>(-radius+<span class="number">50</span>,-radius + <span class="number">50</span>,<span class="number">2</span>*(radius<span class="number">-50</span>),<span class="number">2</span>*(radius<span class="number">-50</span>));</span><br><span class="line">    <span class="comment">//设置画刷</span></span><br><span class="line">    painter.<span class="built_in">setBrush</span>(<span class="built_in">QColor</span>(<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>));</span><br><span class="line">    painter.<span class="built_in">drawPath</span>(inRing);</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>绘制小圆的代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawCircle_bom_small</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//保存绘图对象</span></span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    <span class="comment">//计算大小圆路径</span></span><br><span class="line">    QPainterPath inRing;</span><br><span class="line">    inRing.<span class="built_in">moveTo</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    inRing.<span class="built_in">addEllipse</span>(-radius+<span class="number">50</span>,-radius + <span class="number">50</span>,<span class="number">2</span>*(radius<span class="number">-50</span>),<span class="number">2</span>*(radius<span class="number">-50</span>));</span><br><span class="line">    <span class="comment">//设置画刷</span></span><br><span class="line">    painter.<span class="built_in">setBrush</span>(<span class="built_in">QColor</span>(<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>));</span><br><span class="line">    painter.<span class="built_in">drawPath</span>(inRing);</span><br><span class="line"></span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>绘制发光内圈的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawCircle_bom_shine</span><span class="params">(QPainter &amp;painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    <span class="function">QRadialGradient <span class="title">radialGradient</span><span class="params">(<span class="number">0</span>,<span class="number">0</span>,radius,<span class="number">0</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">    <span class="comment">//    radialGradient.setColorAt(0.5,QColor(8,77,197));</span></span><br><span class="line">    radialGradient.<span class="built_in">setColorAt</span>(<span class="number">0.5</span>,<span class="built_in">QColor</span>(<span class="number">10</span>,<span class="number">68</span>,<span class="number">185</span>,<span class="number">150</span>));</span><br><span class="line">    radialGradient.<span class="built_in">setColorAt</span>(<span class="number">1.0</span>,Qt::transparent);</span><br><span class="line">    painter.<span class="built_in">setBrush</span>(<span class="built_in">QBrush</span>(radialGradient));</span><br><span class="line">    painter.<span class="built_in">drawRect</span>(-radius,-radius,<span class="number">2</span>*(radius),<span class="number">2</span>*(radius));</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>总体效果图：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301513631.png" alt="image-20220830151303554"></p>
+<h2 id="8、绘制单位和时速"><a href="#8、绘制单位和时速" class="headerlink" title="8、绘制单位和时速"></a>8、绘制单位和时速</h2><p>绘制速度单位的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawUnit</span><span class="params">(QPainter &amp; painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    painter.<span class="built_in">setPen</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>));</span><br><span class="line">    QFont font;</span><br><span class="line">    font.<span class="built_in">setFamily</span>(<span class="string">&quot;Arial&quot;</span>);</span><br><span class="line">    font.<span class="built_in">setPointSize</span>(<span class="number">16</span>);</span><br><span class="line">    font.<span class="built_in">setBold</span>(<span class="literal">true</span>);</span><br><span class="line">    painter.<span class="built_in">setFont</span>(font);</span><br><span class="line">    painter.<span class="built_in">drawText</span>(<span class="number">-50</span>, -radius, <span class="number">100</span>, <span class="number">20</span>,Qt::AlignCenter,<span class="built_in">QString</span>(<span class="string">&quot;km/h&quot;</span>));</span><br><span class="line">    painter.<span class="built_in">drawText</span>(<span class="number">-60</span>, -radius + <span class="number">130</span>, <span class="number">120</span>, <span class="number">40</span>,Qt::AlignCenter,<span class="built_in">QString</span>(<span class="string">&quot;当前车速&quot;</span>));</span><br><span class="line"></span><br><span class="line">    painter.<span class="built_in">setPen</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">50</span>));</span><br><span class="line">    painter.<span class="built_in">drawText</span>(<span class="number">-120</span>, -radius + <span class="number">280</span>, <span class="number">250</span>, <span class="number">40</span>,Qt::AlignCenter,<span class="built_in">QString</span>(<span class="string">&quot;-请按space键加速-&quot;</span>));</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>绘制时速的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::DrawNum</span><span class="params">(QPainter &amp; painter, <span class="type">int</span> radius)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    painter.<span class="built_in">save</span>();</span><br><span class="line">    painter.<span class="built_in">setPen</span>(<span class="built_in">QColor</span>(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>));</span><br><span class="line">    QFont font;</span><br><span class="line">    font.<span class="built_in">setFamily</span>(<span class="string">&quot;Arial&quot;</span>);</span><br><span class="line">    font.<span class="built_in">setPointSize</span>(<span class="number">45</span>);</span><br><span class="line">    painter.<span class="built_in">setFont</span>(font);</span><br><span class="line">    painter.<span class="built_in">drawText</span>(<span class="number">-75</span>, -radius - <span class="number">20</span>, <span class="number">150</span>, <span class="number">100</span>,Qt::AlignCenter,QString::<span class="built_in">number</span>(degRotate));</span><br><span class="line">    painter.<span class="built_in">restore</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果图：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208301515543.png" alt="image-20220830151543465"></p>
+<h2 id="9、键盘事件和鼠标事件控制车速"><a href="#9、键盘事件和鼠标事件控制车速" class="headerlink" title="9、键盘事件和鼠标事件控制车速"></a>9、键盘事件和鼠标事件控制车速</h2><p>首先我们需要定义一个定时器timer，然后先将以下键盘事件，我们定义一个direction和degRotate，direction为0时代表减速或者车速为0，为1代表加速，degRotate代表车速，一开始为0。</p>
+<p>当我们按下空格键时，定时器开始，同样的direction变为1，当定时器超时的时候，执行槽函数speed_changed。</p>
+<p>下面是键盘按下事件的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::keyPressEvent</span><span class="params">(QKeyEvent *event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(event-&gt;<span class="built_in">key</span>()==Qt::Key_Space)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(direction==<span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            timer-&gt;<span class="built_in">start</span>(<span class="number">1</span>);</span><br><span class="line">            direction=<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是槽函数speed_changed的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::speed_changed</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(direction == <span class="number">1</span>)<span class="comment">//加速</span></span><br><span class="line">    &#123;</span><br><span class="line">        degRotate++;</span><br><span class="line">        <span class="keyword">if</span>(degRotate &gt; <span class="number">240</span>)</span><br><span class="line">            degRotate = <span class="number">240</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(direction == <span class="number">0</span>)<span class="comment">//减速</span></span><br><span class="line">    &#123;</span><br><span class="line">        degRotate--;</span><br><span class="line">        <span class="keyword">if</span>(degRotate &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            degRotate = <span class="number">0</span>;</span><br><span class="line">            timer-&gt;<span class="built_in">stop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">update</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当我们松开空格键时，direction为0，开始减速。代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::keyReleaseEvent</span><span class="params">(QKeyEvent *event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(event-&gt;<span class="built_in">key</span>()==Qt::Key_Space)</span><br><span class="line">    &#123;</span><br><span class="line">        direction=<span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是鼠标点击事件和鼠标松开事件，当我们点击鼠标时，车速增加，松开时车速减少。</p>
+<p>鼠标点击事件代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::mousePressEvent</span><span class="params">(QMouseEvent *event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(event-&gt;<span class="built_in">button</span>()==Qt::LeftButton)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(direction==<span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            is_Pressed=<span class="literal">true</span>;</span><br><span class="line">            timer-&gt;<span class="built_in">start</span>(<span class="number">1</span>);</span><br><span class="line">            direction=<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>鼠标松开事件代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Widget::mouseReleaseEvent</span><span class="params">(QMouseEvent *event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">Q_UNUSED</span>(event);</span><br><span class="line">    is_Pressed=<span class="literal">false</span>;</span><br><span class="line">    direction=<span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="10、代码获取"><a href="#10、代码获取" class="headerlink" title="10、代码获取"></a>10、代码获取</h2><p>我已经将代码推送到了gitee上面了，想要源码的可以通过下方链接获取：</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/GoodNightZoe/car-board.git">汽车仪表盘</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://jjking20010901.github.io">Sakura</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://jjking20010901.github.io/posts/cb2eafdb.html">https://jjking20010901.github.io/posts/cb2eafdb.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jjking20010901.github.io" target="_blank">Sakura的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/QtWidget%E8%87%AA%E7%BB%98/">QtWidget自绘</a></div><div class="post_share"><div class="social-share" data-image="https://source.fomal.cc/img/default_cover_11.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/eaeeda04.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_16.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">右值引用和完美转发</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img2.woyaogexing.com/2019/04/27/a8322a40f63b40f79f5300d7fd75bf18!400x400.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Sakura</div><div class="author-info__description">一个有趣的博客</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/jjking20010901"><i class="fab fa-github"></i><span>🛴前往小家...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/jjking20010901" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1216617642@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E6%B1%BD%E8%BD%A6%E4%BB%AA%E8%A1%A8%E7%9B%98%E6%95%88%E6%9E%9C%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">1、汽车仪表盘效果图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E7%BB%98%E5%88%B6%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87"><span class="toc-number">2.</span> <span class="toc-text">2、绘制前的准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E7%BB%98%E5%88%B6%E5%88%BB%E5%BA%A6%E7%BA%BF"><span class="toc-number">3.</span> <span class="toc-text">3、绘制刻度线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E5%88%BB%E5%BA%A6%E6%95%B0%E5%AD%97"><span class="toc-number">4.</span> <span class="toc-text">4、刻度数字</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E7%BB%98%E5%88%B6%E5%8F%91%E5%85%89%E7%9A%84%E5%9C%86%E5%9C%88"><span class="toc-number">5.</span> <span class="toc-text">5、绘制发光的圆圈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%E3%80%81%E7%BB%98%E5%88%B6%E6%8C%87%E9%92%88"><span class="toc-number">6.</span> <span class="toc-text">6、绘制指针</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%E3%80%81%E7%BB%98%E5%88%B6%E4%B8%AD%E9%97%B4%E5%A4%A7%E5%9C%86%E3%80%81%E5%B0%8F%E5%9C%86%E4%BB%A5%E5%8F%8A%E5%8F%91%E5%85%89%E5%86%85%E5%9C%88"><span class="toc-number">7.</span> <span class="toc-text">7、绘制中间大圆、小圆以及发光内圈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%E3%80%81%E7%BB%98%E5%88%B6%E5%8D%95%E4%BD%8D%E5%92%8C%E6%97%B6%E9%80%9F"><span class="toc-number">8.</span> <span class="toc-text">8、绘制单位和时速</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%E3%80%81%E9%94%AE%E7%9B%98%E4%BA%8B%E4%BB%B6%E5%92%8C%E9%BC%A0%E6%A0%87%E4%BA%8B%E4%BB%B6%E6%8E%A7%E5%88%B6%E8%BD%A6%E9%80%9F"><span class="toc-number">9.</span> <span class="toc-text">9、键盘事件和鼠标事件控制车速</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10%E3%80%81%E4%BB%A3%E7%A0%81%E8%8E%B7%E5%8F%96"><span class="toc-number">10.</span> <span class="toc-text">10、代码获取</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/cb2eafdb.html" title="汽车仪表盘绘制"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_11.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="汽车仪表盘绘制"/></a><div class="content"><a class="title" href="/posts/cb2eafdb.html" title="汽车仪表盘绘制">汽车仪表盘绘制</a><time datetime="2022-11-05T04:53:44.000Z" title="发表于 2022-11-05 12:53:44">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/eaeeda04.html" title="右值引用和完美转发"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_16.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="右值引用和完美转发"/></a><div class="content"><a class="title" href="/posts/eaeeda04.html" title="右值引用和完美转发">右值引用和完美转发</a><time datetime="2022-11-04T09:09:13.000Z" title="发表于 2022-11-04 17:09:13">2022-11-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Sakura</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="1708664797" data-server="tencent" data-type="playlist" data-order="list" data-fixed="true" data-preload="auto" data-autoplay="false" data-mutex="true" ></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><div class="app-refresh" id="app-refresh" style="position: fixed;top: -2.2rem;left: 0;right: 0;z-index: 99999;padding: 0 1rem;font-size: 15px;height: 2.2rem;transition: all 0.3s ease;"><div class="app-refresh-wrap" style=" display: flex;color: #fff;height: 100%;align-items: center;justify-content: center;"><label>? ������������ ?</label><a href="javascript:void(0)" onclick="location.reload()"><span style="color: #fff;text-decoration: underline;cursor: pointer;">?���ʳ��?</span></a></div></div><script>if ('serviceWorker' in navigator) {
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+showNotification()
+})
+}
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('/sw.js')
+})
+}
+function showNotification() {
+if (GLOBAL_CONFIG.Snackbar) {
+var snackbarBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+GLOBAL_CONFIG.Snackbar.bgLight :
+GLOBAL_CONFIG.Snackbar.bgDark
+var snackbarPos = GLOBAL_CONFIG.Snackbar.position
+Snackbar.show({
+text: '? ������������ ?',
+backgroundColor: snackbarBg,
+duration: 500000,
+pos: snackbarPos,
+actionText: '?���ʳ��?',
+actionTextColor: '#fff',
+onActionClick: function(e) {
+location.reload()
+},
+})
+} else {
+var showBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+'#3b70fc' :
+'#1f1f1f'
+var cssText = `top: 0; background: ${showBg};`
+document.getElementById('app-refresh').style.cssText = cssText
+}
+}</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script>
+    // 全局变量声明区域
+    var fdata = {
+      apiurl: 'https://hexo-friendcircle-api-ai9d4hwad-anzhiyu-c.vercel.app/api',
+      initnumber: 20, //【可选】页面初始化展示文章数量
+      stepnumber: 10, //【可选】每次加载增加的篇数
+      error_img: 'https://npm.elemecdn.com/akilar-candyassets/image/404.gif' //【可选，头像图片加载失败时的默认头像】
+    }
+    //存入本地存储
+    localStorage.setItem("fdatalist",JSON.stringify(fdata))
+    </script>
+    <script defer src="https://npm.elemecdn.com/hexo-filter-fcircle/assets/js/fetch.min.js"></script><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 190px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 160px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://img-blog.csdnimg.cn/img_convert/acea126d07748d6630f37b1b481e5d73.png#pic_center);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/QtWidget/&quot;);" href="javascript:void(0);">QtWidget</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">CPP11的学习</span></li><li class="categoryBar-list-item" style="background:url(https://img-blog.csdnimg.cn/img_convert/cfdaf87ba57fa1099a94d87809378cbb.png#pic_center);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CPP11的学习/&quot;);" href="javascript:void(0);">CPP11的学习</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">QtWidget</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var qweather_key = '53151388ad8f42a8908db119eb7c6e5b';
+  var gaud_map_key = 'ee8a324f0f9fa182ced898c6140d911e';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '112.6534116,27.96920845';
+  var clock_default_rectangle_enable = 'true';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.js"></script><script async src="/js/ali_font.js"></script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="鍗氬妗嗘灦涓篐exo_v6.2.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="涓婚鐗堟湰Butterfly_v4.3.1" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="鏈珯閲囩敤澶氱嚎閮ㄧ讲锛屼富绾胯矾鎵樼浜嶸ercel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="鏈珯閲囩敤澶氱嚎閮ㄧ讲锛屽鐢ㄧ嚎璺墭绠′簬4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="鏈珯椤圭洰鐢盙ithub鎵樼" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="鏈珯閲囩敤鐭ヨ瘑鍏变韩缃插悕-闈炲晢涓氭€т娇鐢�-鐩稿悓鏂瑰紡鍏变韩4.0鍥介檯璁稿彲鍗忚杩涜璁稿彲" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/"});</script></body></html>
