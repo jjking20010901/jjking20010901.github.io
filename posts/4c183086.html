@@ -1,0 +1,469 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>共享智能指针 | Sakura的博客</title><meta name="author" content="Sakura"><meta name="copyright" content="Sakura"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="智能指针的简介在C++中没有垃圾回收机制，必须自己释放分配内存，否则就会造成内存泄漏。解决这个问题最有效的方法是使用智能指针(smart pointer)。智能指针是存储指向动态内存分配(堆)对象指针的类，用于生存期的控制，能够确保在离开指针所在作用域时，自动的销毁动态分配的对象，防止内存泄漏。智能指针的核心实现技术是引用计数，每使用它一次，内部引用计数加1，每析构一次内部的引用计数减1，减为0时">
+<meta property="og:type" content="article">
+<meta property="og:title" content="共享智能指针">
+<meta property="og:url" content="https://jjking20010901.github.io/posts/4c183086.html">
+<meta property="og:site_name" content="Sakura的博客">
+<meta property="og:description" content="智能指针的简介在C++中没有垃圾回收机制，必须自己释放分配内存，否则就会造成内存泄漏。解决这个问题最有效的方法是使用智能指针(smart pointer)。智能指针是存储指向动态内存分配(堆)对象指针的类，用于生存期的控制，能够确保在离开指针所在作用域时，自动的销毁动态分配的对象，防止内存泄漏。智能指针的核心实现技术是引用计数，每使用它一次，内部引用计数加1，每析构一次内部的引用计数减1，减为0时">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://source.fomal.cc/img/default_cover_4.webp">
+<meta property="article:published_time" content="2022-11-05T07:39:40.000Z">
+<meta property="article:modified_time" content="2022-11-05T07:41:07.516Z">
+<meta property="article:author" content="Sakura">
+<meta property="article:tag" content="共享智能指针">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://source.fomal.cc/img/default_cover_4.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://jjking20010901.github.io/posts/4c183086"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="#3b70fc"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/128.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="mask-icon" href="/img/siteicon/128.png" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Sakura","link":"链接: ","source":"来源: Sakura的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '共享智能指针',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-11-05 15:41:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.css" /><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Sakura的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img2.woyaogexing.com/2019/04/27/a8322a40f63b40f79f5300d7fd75bf18!400x400.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/bangumis/index.html"><i class="fa-fw fas fa-home"></i><span> 番剧</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://source.fomal.cc/img/default_cover_4.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Sakura的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/bangumis/index.html"><i class="fa-fw fas fa-home"></i><span> 番剧</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">共享智能指针</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-05T07:39:40.000Z" title="发表于 2022-11-05 15:39:40">2022-11-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-05T07:41:07.516Z" title="更新于 2022-11-05 15:41:07">2022-11-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CPP11%E7%9A%84%E5%AD%A6%E4%B9%A0/">CPP11的学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="共享智能指针"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="智能指针的简介"><a href="#智能指针的简介" class="headerlink" title="智能指针的简介"></a>智能指针的简介</h2><p>在C++中没有垃圾回收机制，必须自己释放分配内存，否则就会造成内存泄漏。解决这个问题最有效的方法是使用智能指针(smart pointer)。<strong>智能指针是存储指向动态内存分配(堆)对象指针的类，用于生存期的控制，能够确保在离开指针所在作用域时，自动的销毁动态分配的对象，防止内存泄漏。智能指针的核心实现技术是引用计数，每使用它一次，内部引用计数加1，每析构一次内部的引用计数减1，减为0时，删除所指向的堆内存。</strong></p>
+<p>C++11中提供了三种智能指针，使用这些智能指针时所需要引用的头文件为<strong><memory></strong>：</p>
+<ul>
+<li>std::shared_ptr：共享智能指针。</li>
+<li>std::unique_ptr：独占智能指针。</li>
+<li>std::weak_ptr：弱引用智能指针，它不共享指针，不能操作资源，是用来监视shared_ptr的。</li>
+</ul>
+<h2 id="1、shared-ptr的初始化"><a href="#1、shared-ptr的初始化" class="headerlink" title="1、shared_ptr的初始化"></a>1、shared_ptr的初始化</h2><p>共享智能指针是指多个智能指针可以同时管理同一块有效的内存，<strong>共享智能指针shared_ptr是一个模板类</strong>，<strong>如果要进行初始化有三种方式：通过构造函数、std::make_shared辅助函数以及reset方法。</strong>共享智能指针对象初始化完毕后就指向了要管理的那块堆内存，如果想要查看当前有多少智能指针同时管理着这块内存可以使用共享智能指针提供的一个成员函数<strong>use_count，</strong>函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 管理当前对象的 shared_ptr 实例数量，或若无被管理对象则为 0。</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="title">use_count</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br></pre></td></tr></table></figure>
+<h2 id="1-1、通过构造函数初始化"><a href="#1-1、通过构造函数初始化" class="headerlink" title="1.1、通过构造函数初始化"></a>1.1、通过构造函数初始化</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// shared_ptr&lt;T&gt; 类模板中，提供了多种实用的构造函数, 语法格式如下:</span></span><br><span class="line">std::shared_ptr&lt;T&gt; 智能指针名字(创建堆内存);</span><br></pre></td></tr></table></figure>
+<p>测试代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 使用智能指针管理一块 int 型的堆内存</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">520</span>))</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr1.use_count: &quot;</span> &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="comment">// 使用智能指针管理一块字符数组对应的堆内存</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">char</span>&gt; <span class="title">ptr2</span><span class="params">(<span class="keyword">new</span> <span class="type">char</span>[<span class="number">12</span>])</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr2.use_count: &quot;</span> &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="comment">// 创建智能指针对象, 不管理任何内存</span></span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr3;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr3.use_count: &quot;</span> &lt;&lt; ptr3.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="comment">// 创建智能指针对象, 初始化为空</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr4</span><span class="params">(<span class="literal">nullptr</span>)</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr4.use_count: &quot;</span> &lt;&lt; ptr4.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试代码输出结果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208191005888.png" alt="image-20220819100556838"></p>
+<p><strong>注意：</strong></p>
+<p><strong>如果智能指针被初始化一块有效内存，那么这块内存的引用计数+1，如果智能指针没有被初始化或者被初始化为nullptr空指针，引用计数不会+1，另外，不要使用一个原始指针初始化多个shared_ptr。</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *p = <span class="keyword">new</span> <span class="type">int</span>;</span><br><span class="line"><span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p1</span><span class="params">(p)</span></span>;</span><br><span class="line"><span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p2</span><span class="params">(p)</span></span>;		<span class="comment">// error, 编译不会报错, 运行会出错，指针p已经初始化了p1了</span></span><br></pre></td></tr></table></figure>
+<h2 id="1-2、通过拷贝和移动构造函数初始化"><a href="#1-2、通过拷贝和移动构造函数初始化" class="headerlink" title="1.2、通过拷贝和移动构造函数初始化"></a>1.2、通过拷贝和移动构造函数初始化</h2><p>当一个智能指针被初始化之后，就可以通过这个智能指针初始化其他新对象。在创建新对象的时候，对应的拷贝构造函数或者移动构造函数就可以被自动调用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 使用智能指针管理一块 int 型的堆内存, 内部引用计数为 1</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">520</span>))</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr1管理的内存引用计数: &quot;</span> &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="comment">//调用拷贝构造函数</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr2</span><span class="params">(ptr1)</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr2管理的内存引用计数: &quot;</span> &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr3 = ptr1;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr3管理的内存引用计数: &quot;</span> &lt;&lt; ptr3.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="comment">//调用移动构造函数</span></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr4</span><span class="params">(std::move(ptr1))</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr4管理的内存引用计数: &quot;</span> &lt;&lt; ptr4.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; ptr5 = std::<span class="built_in">move</span>(ptr2);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr5管理的内存引用计数: &quot;</span> &lt;&lt; ptr5.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试程序结果的输出如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208191016085.png" alt="image-20220819101609028"></p>
+<p><strong>注意：</strong></p>
+<p><strong>如果使用拷贝的方式初始化共享智能指针对象，这两个对象会同时管理同一块堆内存，堆内存对应的引用计数也会增加；如果使用移动的方式初始化智能指针对象，只是转让了内存的所有权，管理内存的对象并不会增加，因此内存引用计数不会变化。</strong></p>
+<h2 id="1-3、通过std-make-shared初始化"><a href="#1-3、通过std-make-shared初始化" class="headerlink" title="1.3、通过std::make_shared初始化"></a>1.3、通过std::make_shared初始化</h2><p>通过C++提供的std::make_shared()就可以完成内存对象的创建并将其初始化给智能指针，函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> T, <span class="keyword">class</span>... Args &gt;</span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">make_shared</span><span class="params">( Args&amp;&amp;... args )</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>T：模板参数的数据类型。</strong></p>
+</li>
+<li><p><strong>Arg&amp;&amp;…arg：要初始化的数据，如果是通过make_shared创建对象，需要按照构造函数的参数列表指定。</strong></p>
+</li>
+</ul>
+<p>测试代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>() </span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;construct Test...&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Test</span>(<span class="type">int</span> x) </span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;construct Test, x = &quot;</span> &lt;&lt; x &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Test</span>(string str) </span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;construct Test, str = &quot;</span> &lt;&lt; str &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">Test</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;destruct Test ...&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 使用智能指针管理一块 int 型的堆内存, 内部引用计数为 1</span></span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr1 = <span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">520</span>);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr1管理的内存引用计数: &quot;</span> &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    shared_ptr&lt;Test&gt; ptr2 = <span class="built_in">make_shared</span>&lt;Test&gt;();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr2管理的内存引用计数: &quot;</span> &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    shared_ptr&lt;Test&gt; ptr3 = <span class="built_in">make_shared</span>&lt;Test&gt;(<span class="number">520</span>);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr3管理的内存引用计数: &quot;</span> &lt;&lt; ptr3.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    shared_ptr&lt;Test&gt; ptr4 = <span class="built_in">make_shared</span>&lt;Test&gt;(<span class="string">&quot;luffy&quot;</span>);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr4管理的内存引用计数: &quot;</span> &lt;&lt; ptr4.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试代码的输出结果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208191031378.png" alt="image-20220819103120318"></p>
+<p><strong>注意：</strong></p>
+<p><strong>使用st::make_shared()模板函数可以完成内存地址的创建，并将最终的内存地址传递给共享智能指针对象管理。如果申请的内存是普通类型，通过函数的()可完成地址的初始化，如果要创建一个类对象，函数的()内部需要指定构造函数对象需要的参数，也就是类构造函数的参数。</strong></p>
+<h2 id="1-4、通过reset方法初始化"><a href="#1-4、通过reset方法初始化" class="headerlink" title="1.4、通过reset方法初始化"></a>1.4、通过reset方法初始化</h2><p>共享智能指针类提供的std::shared_ptr::reset方法函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">reset</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> Y &gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">reset</span><span class="params">( Y* ptr )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> Y, <span class="keyword">class</span> Deleter &gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">reset</span><span class="params">( Y* ptr, Deleter d )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt; <span class="keyword">class</span> Y, <span class="keyword">class</span> Deleter, <span class="keyword">class</span> Alloc &gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">reset</span><span class="params">( Y* ptr, Deleter d, Alloc alloc )</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>ptr：指向要取得所有权的对象的指针。</strong></li>
+<li><strong>d：指向要取得所有权的对象的指针。</strong></li>
+<li><strong>aloc：内部存储所用的分配器。</strong></li>
+</ul>
+<p>测试代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 使用智能指针管理一块 int 型的堆内存, 内部引用计数为 1</span></span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr1 = <span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">520</span>);</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr2 = ptr1;</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr3 = ptr1;</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr4 = ptr1;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr1.use_count: &quot;</span> &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr2.use_count: &quot;</span> &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr3.use_count: &quot;</span> &lt;&lt; ptr3.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr4.use_count: &quot;</span> &lt;&lt; ptr4.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    ptr4.<span class="built_in">reset</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr1.use_count: &quot;</span> &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr2.use_count: &quot;</span> &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr3.use_count: &quot;</span> &lt;&lt; ptr3.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr4.use_count: &quot;</span> &lt;&lt; ptr4.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr5;</span><br><span class="line">    ptr5.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">250</span>));</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ptr5.use_count: &quot;</span> &lt;&lt; ptr5.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试代码输出结果如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208191041241.png" alt="image-20220819104137179"></p>
+<p><strong>注意：</strong></p>
+<p><strong>对于一个未初始化的共享内存指针，可以通过reset方法初始化，当智能指针中有值时，调用reset方法会使引用计数减1。</strong></p>
+<h2 id="1-5、获取原始指针"><a href="#1-5、获取原始指针" class="headerlink" title="1.5、获取原始指针"></a>1.5、获取原始指针</h2><p>对应用基础数据类型来说，通过操作智能指针和操作智能指针管理内存效果是一样的，可以直接完成数据的读写。</p>
+<p>但是如果共享智能指针管理的是一个对象，那么就需要去除原始内存地址再操作，可以调用共享智能指针类提供的get方法得到原始地址，其函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">T* <span class="title">get</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br></pre></td></tr></table></figure>
+<p>测试代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> len = <span class="number">128</span>;</span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">char</span>&gt; <span class="title">ptr</span><span class="params">(<span class="keyword">new</span> <span class="type">char</span>[len])</span></span>;</span><br><span class="line">    <span class="comment">// 得到指针的原始地址</span></span><br><span class="line">    <span class="type">char</span>* add = ptr.<span class="built_in">get</span>();</span><br><span class="line">    <span class="comment">//初始化字符串</span></span><br><span class="line">    <span class="built_in">memset</span>(add, <span class="number">0</span>, len);</span><br><span class="line">    <span class="built_in">strcpy</span>(add, <span class="string">&quot;I will be luffy !!!&quot;</span>);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;string: &quot;</span> &lt;&lt; add &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>)</span></span>;</span><br><span class="line">    *p = <span class="number">100</span>;</span><br><span class="line">    cout &lt;&lt; *p.<span class="built_in">get</span>() &lt;&lt; <span class="string">&quot;  &quot;</span> &lt;&lt; *p &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试程序的输出如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://raw.githubusercontent.com/jjking20010901/typora/master/img202208191056577.png" alt="image-20220819105634516"></p>
+<h2 id="2、指定删除器"><a href="#2、指定删除器" class="headerlink" title="2、指定删除器"></a>2、指定删除器</h2><p>当智能指针管理的内存对应的引用计数变为0的时候，这块内存就会被智能指针给析构掉了。另外，我们在初始化智能指针的时候也可以自己指定删除动作，这个删除操作对应的函数被称之为删除器，这个删除器函数的本质就是一个回调函数，我们只需要进行实现，其调用是由智能指针完成的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义删除器函数，释放int型内存</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">deleteIntPtr</span><span class="params">(<span class="type">int</span>* p)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">delete</span> p;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;int 型内存被释放了...&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">250</span>), deleteIntPtr)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>删除器函数也可以lambda表达式，因此代码也可以写成下面这样：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">250</span>), [](<span class="type">int</span>* p) &#123;<span class="keyword">delete</span> p; &#125;)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中，<strong>lambda表达式的参数就是智能指针管理内存的地址，有了这个地址之后函数体内部就可以完成删除操作了。</strong></p>
+<p>在C++11中使用shared_ptr管理动态数组，需要指定删除器，因为std::make_shared_ptr的默认删除器不支持数组对象，具体处理代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>], [](<span class="type">int</span>* p) &#123;<span class="keyword">delete</span>[]p; &#125;)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在删除数组内存时，除了自己编写删除器，也可以使用<strong>C++提供的std::default_delete<T>()</strong>函数作为删除器。</p>
+<p>这个函数内部删除功能也是通过调用delete来实现的，要释放什么类型的内存就将模板类型指定为什么类型即可，具体处理代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">ptr</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>], default_delete&lt;<span class="type">int</span>[]&gt;())</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，我们也可以自己封装一个make_shared_array方法让shared_ptr支持数组，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">make_share_array</span><span class="params">(<span class="type">size_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 返回匿名对象</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> T[size], <span class="built_in">default_delete</span>&lt;T[]&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    shared_ptr&lt;<span class="type">int</span>&gt; ptr1 = <span class="built_in">make_share_array</span>&lt;<span class="type">int</span>&gt;(<span class="number">10</span>);</span><br><span class="line">    cout &lt;&lt; ptr1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    shared_ptr&lt;<span class="type">char</span>&gt; ptr2 = <span class="built_in">make_share_array</span>&lt;<span class="type">char</span>&gt;(<span class="number">128</span>);</span><br><span class="line">    cout &lt;&lt; ptr2.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://jjking20010901.github.io">Sakura</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://jjking20010901.github.io/posts/4c183086.html">https://jjking20010901.github.io/posts/4c183086.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jjking20010901.github.io" target="_blank">Sakura的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%85%B1%E4%BA%AB%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">共享智能指针</a></div><div class="post_share"><div class="social-share" data-image="https://source.fomal.cc/img/default_cover_4.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/f6e04cde.html"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_16.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">CPP实现Vector容器</div></div></a></div><div class="next-post pull-right"><a href="/posts/d2973973.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_3.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">RALL原则和unique_ptr</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img2.woyaogexing.com/2019/04/27/a8322a40f63b40f79f5300d7fd75bf18!400x400.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Sakura</div><div class="author-info__description">不积跬步无以至千里</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/jjking20010901"><i class="fab fa-github"></i><span>🛴前往小家...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/jjking20010901" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1216617642@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">智能指针的简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81shared-ptr%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">1、shared_ptr的初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E3%80%81%E9%80%9A%E8%BF%87%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.</span> <span class="toc-text">1.1、通过构造函数初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E3%80%81%E9%80%9A%E8%BF%87%E6%8B%B7%E8%B4%9D%E5%92%8C%E7%A7%BB%E5%8A%A8%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">1.2、通过拷贝和移动构造函数初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E3%80%81%E9%80%9A%E8%BF%87std-make-shared%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">5.</span> <span class="toc-text">1.3、通过std::make_shared初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4%E3%80%81%E9%80%9A%E8%BF%87reset%E6%96%B9%E6%B3%95%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">6.</span> <span class="toc-text">1.4、通过reset方法初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5%E3%80%81%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%A7%8B%E6%8C%87%E9%92%88"><span class="toc-number">7.</span> <span class="toc-text">1.5、获取原始指针</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E6%8C%87%E5%AE%9A%E5%88%A0%E9%99%A4%E5%99%A8"><span class="toc-number">8.</span> <span class="toc-text">2、指定删除器</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/f6e04cde.html" title="CPP实现Vector容器"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_16.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CPP实现Vector容器"/></a><div class="content"><a class="title" href="/posts/f6e04cde.html" title="CPP实现Vector容器">CPP实现Vector容器</a><time datetime="2022-11-05T12:42:52.000Z" title="发表于 2022-11-05 20:42:52">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/4c183086.html" title="共享智能指针"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_4.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="共享智能指针"/></a><div class="content"><a class="title" href="/posts/4c183086.html" title="共享智能指针">共享智能指针</a><time datetime="2022-11-05T07:39:40.000Z" title="发表于 2022-11-05 15:39:40">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/d2973973.html" title="RALL原则和unique_ptr"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_3.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RALL原则和unique_ptr"/></a><div class="content"><a class="title" href="/posts/d2973973.html" title="RALL原则和unique_ptr">RALL原则和unique_ptr</a><time datetime="2022-11-05T07:31:56.000Z" title="发表于 2022-11-05 15:31:56">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/cb2eafdb.html" title="汽车仪表盘绘制"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_5.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="汽车仪表盘绘制"/></a><div class="content"><a class="title" href="/posts/cb2eafdb.html" title="汽车仪表盘绘制">汽车仪表盘绘制</a><time datetime="2022-11-05T04:53:44.000Z" title="发表于 2022-11-05 12:53:44">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/eaeeda04.html" title="右值引用和完美转发"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://source.fomal.cc/img/default_cover_18.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="右值引用和完美转发"/></a><div class="content"><a class="title" href="/posts/eaeeda04.html" title="右值引用和完美转发">右值引用和完美转发</a><time datetime="2022-11-04T09:09:13.000Z" title="发表于 2022-11-04 17:09:13">2022-11-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Sakura</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="1708664797" data-server="tencent" data-type="playlist" data-order="list" data-fixed="true" data-preload="auto" data-autoplay="false" data-mutex="true" ></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><div class="app-refresh" id="app-refresh" style="position: fixed;top: -2.2rem;left: 0;right: 0;z-index: 99999;padding: 0 1rem;font-size: 15px;height: 2.2rem;transition: all 0.3s ease;"><div class="app-refresh-wrap" style=" display: flex;color: #fff;height: 100%;align-items: center;justify-content: center;"><label>? ������������ ?</label><a href="javascript:void(0)" onclick="location.reload()"><span style="color: #fff;text-decoration: underline;cursor: pointer;">?���ʳ��?</span></a></div></div><script>if ('serviceWorker' in navigator) {
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+showNotification()
+})
+}
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('/sw.js')
+})
+}
+function showNotification() {
+if (GLOBAL_CONFIG.Snackbar) {
+var snackbarBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+GLOBAL_CONFIG.Snackbar.bgLight :
+GLOBAL_CONFIG.Snackbar.bgDark
+var snackbarPos = GLOBAL_CONFIG.Snackbar.position
+Snackbar.show({
+text: '? ������������ ?',
+backgroundColor: snackbarBg,
+duration: 500000,
+pos: snackbarPos,
+actionText: '?���ʳ��?',
+actionTextColor: '#fff',
+onActionClick: function(e) {
+location.reload()
+},
+})
+} else {
+var showBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+'#3b70fc' :
+'#1f1f1f'
+var cssText = `top: 0; background: ${showBg};`
+document.getElementById('app-refresh').style.cssText = cssText
+}
+}</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script>
+    // 全局变量声明区域
+    var fdata = {
+      apiurl: 'https://hexo-friendcircle-api-ai9d4hwad-anzhiyu-c.vercel.app/api',
+      initnumber: 20, //【可选】页面初始化展示文章数量
+      stepnumber: 10, //【可选】每次加载增加的篇数
+      error_img: 'https://npm.elemecdn.com/akilar-candyassets/image/404.gif' //【可选，头像图片加载失败时的默认头像】
+    }
+    //存入本地存储
+    localStorage.setItem("fdatalist",JSON.stringify(fdata))
+    </script>
+    <script defer src="https://npm.elemecdn.com/hexo-filter-fcircle/assets/js/fetch.min.js"></script><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 190px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 160px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://img-blog.csdnimg.cn/img_convert/acea126d07748d6630f37b1b481e5d73.png#pic_center);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CPP项目实战/&quot;);" href="javascript:void(0);">CPP项目实战</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">CPP11的学习</span></li><li class="categoryBar-list-item" style="background:url(https://img-blog.csdnimg.cn/img_convert/cfdaf87ba57fa1099a94d87809378cbb.png#pic_center);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CPP11的学习/&quot;);" href="javascript:void(0);">CPP11的学习</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">QtWidget</span></li><li class="categoryBar-list-item" style="background:url(https://img-blog.csdnimg.cn/img_convert/e5259f24f6a5a7fb2331d3fd0d18e631.png#pic_center);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/QtWidget/&quot;);" href="javascript:void(0);">QtWidget</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">QtQuick</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var qweather_key = '53151388ad8f42a8908db119eb7c6e5b';
+  var gaud_map_key = 'ee8a324f0f9fa182ced898c6140d911e';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '112.6534116,27.96920845';
+  var clock_default_rectangle_enable = 'true';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.js"></script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="閸楁艾顓瑰鍡樼仸娑撶瘣exo_v6.2.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="娑撳顣介悧鍫熸拱Butterfly_v4.3.1" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="閺堫剛鐝柌鍥╂暏婢舵氨鍤庨柈銊ц閿涘奔瀵岀痪鑳熅閹垫顓告禍宥竐rcel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="閺堫剛鐝柌鍥╂暏婢舵氨鍤庨柈銊ц閿涘苯顦悽銊у殠鐠侯垱澧粻鈥茬艾4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="閺堫剛鐝い鍦窗閻㈢洐ithub閹垫顓�" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="閺堫剛鐝柌鍥╂暏閻儴鐦戦崗鍙橀煩缂冩彃鎮�-闂堢偛鏅㈡稉姘偓褌濞囬悽锟�-閻╃ǹ鎮撻弬鐟扮础閸忓彉闊�4.0閸ヤ粙妾拋绋垮讲閸楀繗顔呮潻娑滎攽鐠佺ǹ褰�" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.js"></script><script async src="/js/ali_font.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/"});</script></body></html>
