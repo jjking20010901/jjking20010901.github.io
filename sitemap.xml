@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jjking20010901.github.io/posts/ae80a404.html</loc>
+    
+    <lastmod>2022-11-08</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://jjking20010901.github.io/posts/b275f201.html</loc>
     
     <lastmod>2022-11-06</lastmod>
@@ -99,6 +108,13 @@
   </url>
   
   <url>
+    <loc>https://jjking20010901.github.io/tags/chrono%E6%97%B6%E9%97%B4%E5%BA%93/</loc>
+    <lastmod>2022-11-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://jjking20010901.github.io/tags/RALL%E5%8E%9F%E5%88%99%E5%92%8C%E7%8B%AC%E5%8D%A0%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</loc>
     <lastmod>2022-11-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -113,14 +129,14 @@
   </url>
   
   <url>
-    <loc>https://jjking20010901.github.io/tags/%E5%85%B1%E4%BA%AB%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</loc>
+    <loc>https://jjking20010901.github.io/tags/CPP11%E6%96%B0%E7%89%B9%E6%80%A7/</loc>
     <lastmod>2022-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://jjking20010901.github.io/tags/CPP11%E6%96%B0%E7%89%B9%E6%80%A7/</loc>
+    <loc>https://jjking20010901.github.io/tags/%E5%85%B1%E4%BA%AB%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</loc>
     <lastmod>2022-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
